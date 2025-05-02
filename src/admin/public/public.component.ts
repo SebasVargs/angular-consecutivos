@@ -79,6 +79,7 @@ export class PublicComponent implements OnInit {
   cerrarModal(): void {
     this.showModal = false;
     this.resetSolicitud();
+    //Gg my friend
   }
 
   enviarSolicitud(): void {
