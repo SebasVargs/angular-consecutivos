@@ -1,0 +1,110 @@
+.public-container {
+  padding: 20px;
+}
+
+.public-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.public-title {
+  color: #333;
+  font-size: 1.8em;
+  font-weight: 500;
+  margin: 0;
+}
+
+.public-actions .btn-primary {
+  background-color: #1e88e5;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+.public-actions .btn-primary:hover {
+  background-color: #1565c0;
+}
+
+.documents-table-container {
+  overflow-x: auto; /* Permite el scroll horizontal en tablas grandes */
+}
+
+.documents-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden; /* Para que el border-radius afecte también a las filas */
+}
+
+.documents-table thead th {
+  background-color: #f7f7f7;
+  color: #333;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+}
+
+.documents-table tbody td {
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.documents-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.documents-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Estilos específicos para el badge de estado */
+.status-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: white;
+}
+
+.status-pending {
+  background-color: #ffc107; /* Amarillo para pendiente */
+}
+
+.status-approved {
+  background-color: #28a745; /* Verde para aprobado */
+}
+
+.status-rejected {
+  background-color: #dc3545; /* Rojo para rechazado */
+}
+
+.status-processing {
+  background-color: #007bff; /* Azul para procesando */
+}
+
+/* Estilos específicos para el botón de descarga (pequeño y secundario) */
+.btn-secondary.btn-sm {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  font-size: 0.8em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-secondary.btn-sm:hover {
+  background-color: #e0e0e0;
+  border-color: #ccc;
+}

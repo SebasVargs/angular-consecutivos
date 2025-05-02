@@ -1,0 +1,94 @@
+<div class="public-container">
+  <div class="public-header">
+    <h1 class="public-title">Gestión de Documentos</h1>
+    <div class="public-actions">
+      <button class="btn btn-primary" (click)="solicitarConsecutivo()">Solicitar Consecutivo</button>
+    </div>
+  </div>
+
+  <div class="documents-table-container">
+    <table class="documents-table">
+      <thead>
+        <tr>
+          <th>Consecutive</th>
+          <th>Fecha</th>
+          <th>Nombre</th>
+          <th>Estado</th>
+          <th>Carga</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Utilizamos *ngFor para iterar sobre los documentos -->
+        <tr *ngFor="let document of documents">
+          <td>{{ document.id }}</td>
+          <td>{{ document.fecha | date:'dd/MM/yyyy' }}</td> <!-- Formato de fecha -->
+          <td>{{ document.name }}</td>
+          <td>
+            <!-- Cambiamos el estilo de acuerdo con el estado -->
+            <span class="status-badge"
+                  [ngClass]="{
+                    'status-pending': document.status === 'Pendiente',
+                    'status-approved': document.status === 'Aprobado',
+                    'status-rejected': document.status === 'Rechazado',
+                    'status-processing': document.status === 'Procesando'
+                  }">
+              {{ document.status }}
+            </span>
+          </td>
+          <td>
+            <!-- Si el archivo está disponible, mostramos un botón de descarga -->
+            <button class="btn btn-secondary btn-sm" *ngIf="document.load" (click)="descargarDocumento(document.id)">
+              Descargar
+            </button>
+            <!-- Si no está disponible, mostramos un texto -->
+            <span *ngIf="!document.load">No disponible</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal de solicitud de consecutivo -->
+<div class="modal-backdrop" *ngIf="showModal">
+  <div class="modal">
+    <h2>Solicitar nuevo consecutivo</h2>
+    <form (ngSubmit)="enviarSolicitud()" #soliForm="ngForm">
+
+      <!--La fecha sera exactamente la actual-->
+      <label>
+        Fecha de Solicitud:
+        <input type="date" [(ngModel)]="solicitud.date_soli" name="date_soli" required />
+      </label>
+
+      <label>
+        Descripción:
+        <input type="text" [(ngModel)]="solicitud.description" name="description" required />
+      </label>
+
+
+      <!--El usuario será el que esta logeado, en este caso se validara en el localstorage-->
+      <label>
+        Usuario:
+        <select [(ngModel)]="solicitud.id_user" name="id_user" required>
+          <option *ngFor="let user of users" [value]="user._id">{{ user.name }}</option>
+        </select>
+      </label>
+
+
+      <!--El estado siempre estara automatico en PENDIENTE-->
+      <label>
+        Estado:
+        <select [(ngModel)]="solicitud.id_status" name="id_status" required>
+          <option *ngFor="let status of statusVerifs" [value]="status.id">{{ status.name }}</option>
+        </select>
+      </label>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+

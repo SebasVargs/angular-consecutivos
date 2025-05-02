@@ -1,0 +1,21 @@
+.denied-container {
+  text-align: center;
+  padding: 3rem;
+}
+
+.denied-container h1 {
+  color: white;
+}
+
+.denied-container p {
+  color: rgb(196, 195, 195);
+}
+
+.denied-container a {
+  color: #ff6347;
+  text-decoration: none;
+}
+
+.denied-container a:hover {
+  color: #dc553d;
+}

@@ -1,0 +1,58 @@
+<div class="public-container">
+  <div class="public-header">
+    <h1 class="public-title">Gestión de Usuarios</h1>
+    <div class="public-actions">
+      <button class="btn btn-primary" (click)="crearUsuario()">Crear Usuario</button>
+    </div>
+  </div>
+
+  <div class="documents-table-container">
+    <table class="documents-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Rol</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.name }}</td>
+          <td>{{ user.id_rol.name }}</td>
+          <td>{{ user.email }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal de creación de usuario -->
+<div class="modal-backdrop" *ngIf="showModal">
+  <div class="modal">
+    <h2>Crear nuevo usuario</h2>
+    <form (ngSubmit)="submitUser()" #userForm="ngForm">
+      <label>
+        Nombre:
+        <input type="text" [(ngModel)]="newUser.name" name="name" required />
+      </label>
+
+      <label>
+        Email:
+        <input type="email" [(ngModel)]="newUser.email" name="email" required />
+      </label>
+
+      <label>
+        Rol:
+        <select [(ngModel)]="newUser.id_rol" name="id_rol" required>
+          <option *ngFor="let rol of roles" [value]="rol._id">{{ rol.name }}</option>
+        </select>
+      </label>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+

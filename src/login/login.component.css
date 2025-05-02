@@ -1,0 +1,100 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Asegura que el contenedor ocupe al menos toda la altura de la pantalla */
+  padding: 20px;
+}
+
+.login-form-card {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  width: 100%;
+  max-width: 400px; /* Limita el ancho del formulario */
+}
+
+h2 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 500; /* Ligeramente más delgado que el bold por defecto */
+}
+
+h3 {
+  color: #1e88e5; /* Un tono de azul principal */
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-weight: 400; /* Aún más ligero */
+  text-align: center;
+}
+
+p {
+  color: #555;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  color: #333;
+  margin-bottom: 8px;
+  font-weight: 600; /* Un poco más de énfasis */
+}
+
+input[type="email"],
+input[type="text"] {
+  width: calc(100% - 22px); /* Ajuste para el padding */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box; /* Incluye el padding y el border en el ancho */
+}
+
+input[type="email"]:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: #1e88e5; /* Resalta el borde al enfocar */
+  box-shadow: 0 0 5px rgba(30, 136, 229, 0.3); /* Sombra sutil al enfocar */
+}
+
+.btn {
+  background-color: #1e88e5; /* Azul principal */
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease; /* Transición suave para el hover */
+  width: 100%;
+}
+
+.btn:hover {
+  background-color: #1565c0; /* Un tono de azul más oscuro al pasar el ratón */
+}
+
+.message {
+  color: #4caf50; /* Verde para mensajes de éxito */
+  margin-top: 15px;
+  text-align: center;
+}
+
+.error {
+  color: #f44336; /* Rojo para mensajes de error */
+  margin-top: 15px;
+  text-align: center;
+}
+
+.verifying-token {
+  text-align: center;
+  color: #555;
+  margin-top: 20px;
+}

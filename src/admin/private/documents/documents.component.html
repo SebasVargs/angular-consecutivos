@@ -1,0 +1,44 @@
+<div class="public-container">
+  <div class="public-header">
+    <h1 class="public-title">Gestión de Documentos</h1>
+  </div>
+
+  <div class="documents-table-container">
+    <table class="documents-table">
+      <thead>
+        <tr>
+          <th>Consecutive</th>
+          <th>Fecha</th>
+          <th>Nombre</th>
+          <th>Estado</th>
+          <th>Ver</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Utilizamos *ngFor para iterar sobre los documentos -->
+        <tr *ngFor="let document of documents">
+          <td>{{ document.id_consecutive }}</td>
+          <td>{{ document.date_document | date:'dd/MM/yyyy' }}</td>
+          <td>{{ document.source_file }}</td>
+          <td>
+            <span class="status-badge"
+                  [ngClass]="{
+                    'status-pending': document.id_status_name === 'Pendiente',
+                    'status-approved': document.id_status_name === 'Aprobado',
+                    'status-rejected': document.id_status_name === 'Rechazado',
+                    'status-processing': document.id_status_name === 'Procesando'
+                  }">
+              {{ document.id_status_name }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-secondary btn-sm" *ngIf="document.source_file">
+              Descargar
+            </button>
+            <span *ngIf="!document.source_file">No disponible</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

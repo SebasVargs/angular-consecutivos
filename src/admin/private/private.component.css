@@ -1,0 +1,30 @@
+.container {
+  padding: 20px;
+}
+
+.routes-link {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.nav-button {
+  background-color: white;
+  color: #1e88e5;
+  border: 1px solid #1e88e5;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-button:hover {
+  background-color: #1e88e5;
+  color: white;
+}
+
+/* Estilos para el router-outlet (el contenido de las rutas se adaptará) */
+router-outlet + div {
+  margin-top: 20px; /* Espacio entre los botones y el contenido de la ruta */
+}

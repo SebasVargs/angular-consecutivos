@@ -1,0 +1,38 @@
+<nav class="navbar">
+  <div class="navbar-brand" style="cursor: pointer;">
+    <a>Consecutives</a>
+  </div>
+
+  <div class="navbar-menu">
+    <!-- Enlaces de navegación generales -->
+    <div class="navbar-start">
+      <a *ngIf="!isAdmin" class="navbar-item" routerLink="/user" routerLinkActive="active">Inicio</a>
+      <a *ngIf="isAdmin" class="navbar-item" routerLink="/admin/users" routerLinkActive="active">Inicio</a>
+    </div>
+
+    <div class="navbar-end">
+
+      <!-- Si el usuario SÍ está autenticado -->
+      <div *ngIf="isLoggedIn" class="navbar-authenticated">
+        <span class="navbar-item user-info">
+          Bienvenido, {{ userInfo || 'Usuario' }}
+        </span>
+
+        <button class="navbar-item logout-button" (click)="showLogoutModal = true">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="modal-overlay" *ngIf="showLogoutModal">
+  <div class="modal">
+    <p>¿Estás seguro de que deseas cerrar sesión?</p>
+    <div class="modal-actions">
+      <button (click)="confirmLogout()">Sí, cerrar sesión</button>
+      <button (click)="showLogoutModal = false">Cancelar</button>
+    </div>
+  </div>
+</div>
+
