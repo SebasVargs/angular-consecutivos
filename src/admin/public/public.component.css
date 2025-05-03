@@ -1,122 +1,125 @@
-/* Global container for the public page */
 .public-container {
-  color: #fff;
-  padding: 2rem;
-  min-height: 100vh;
-  box-sizing: border-box;
-  width: 100%;
+  padding: 20px;
 }
 
-/* Public header styles */
 .public-header {
-  text-align: center;
-  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-direction: column;
 }
 
 .public-title {
-  font-size: 2rem;
-  color: #fff;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.8em;
+  font-weight: 500;
+  margin: 0;
+  margin-bottom: 2vh;
 }
 
-/* Buttons in the header */
-.public-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.btn {
-  padding: 0.8rem 1.5rem;
-  border-radius: 5px;
-  font-size: 1rem;
+.public-actions .btn-primary {
+  background-color: #1e88e5;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 1em;
   transition: background-color 0.3s ease;
 }
 
 .btn-primary {
-  background-color: #007bff;
+  background-color: #1e88e5;
   color: white;
   border: none;
+  padding: 5px 15px;
+  border-radius: 100px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
+.public-actions .btn-primary:hover {
+  background-color: #1565c0;
 }
 
-.btn-secondary {
-  background-color: #444;
-  color: white;
-  border: none;
-}
-
-.btn-secondary:hover {
-  background-color: #333;
-}
-
-.btn-sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-}
-
-/* Documents table container */
 .documents-table-container {
-  margin-top: 2rem;
-  overflow-x: auto;
+  overflow-x: auto; /* Permite el scroll horizontal en tablas grandes */
 }
 
 .documents-table {
   width: 100%;
   border-collapse: collapse;
-  border: 1px solid #333;
+  margin-top: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden; /* Para que el border-radius afecte también a las filas */
 }
 
-.documents-table th, .documents-table td {
-  padding: 1rem;
+.documents-table thead th {
+  background-color: #f7f7f7;
+  color: #333;
+  padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #333;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
 }
 
-.documents-table th {
-  background-color: #1e1e1e;
-  color: #bbb;
+.documents-table tbody td {
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
 }
 
-.documents-table td {
-  background-color: #2a2a2a;
-  color: #fff;
+.documents-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
-/* Status badge styles */
+.documents-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Estilos específicos para el badge de estado */
 .status-badge {
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  font-size: 0.9rem;
-  text-transform: capitalize;
   display: inline-block;
-  min-width: 100px;
-  text-align: center;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: white;
 }
 
 .status-pending {
-  background-color: #f0ad4e;
-  color: white;
+  background-color: #ffc107; /* Amarillo para pendiente */
 }
 
 .status-approved {
-  background-color: #5bc0de;
-  color: white;
+  background-color: #28a745; /* Verde para aprobado */
 }
 
 .status-rejected {
-  background-color: #d9534f;
-  color: white;
+  background-color: #dc3545; /* Rojo para rechazado */
 }
 
 .status-processing {
-  background-color: #f7c32e;
-  color: white;
+  background-color: #007bff; /* Azul para procesando */
+}
+
+/* Estilos específicos para el botón de descarga (pequeño y secundario) */
+.btn-secondary.btn-sm {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  font-size: 0.8em;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-secondary.btn-sm:hover {
+  background-color: #e0e0e0;
+  border-color: #ccc;
 }
 
 /* Media query for responsiveness */
@@ -226,3 +229,25 @@
 .modal-actions .btn-secondary:hover {
   background-color: #e0e0e0;
 }
+
+.drop-zone {
+  border: 2px dashed #1e88e5;
+  padding: 30px;
+  text-align: center;
+  border-radius: 8px;
+  margin: 20px 0;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease;
+}
+
+.drop-zone:hover {
+  background-color: #eef6fd;
+}
+
+.drop-zone p {
+  margin-bottom: 15px;
+  color: #555;
+}
+
+

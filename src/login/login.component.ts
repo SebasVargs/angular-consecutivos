@@ -81,7 +81,6 @@ export class LoginComponent implements OnInit{
                 this.router.navigate(['/user']);
               }
             } else {
-              // Si no encontramos el email, mostramos un error
               this.error = 'Email no encontrado';
               this.verifyingToken = false;
             }

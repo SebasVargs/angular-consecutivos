@@ -22,8 +22,8 @@ export class DocumentService {
     )
   }
 
-  createDocument(document: any[]): Observable<any>{
-    return this.http.post<any>(`${environment.apiUrl}`, document).pipe(
+  createDocument(document: any): Observable<any>{
+    return this.http.post<any>(`${environment.apiUrl}/${this.doc}`, document).pipe(
       catchError((err) => {
         console.error('Error create document', err)
         return throwError(() => new Error('Error create document'))

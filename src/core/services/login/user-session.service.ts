@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -7,22 +8,27 @@ export class UserSessionService {
 
   private readonly EMAIL_KEY = 'user_email';
 
-  // Obtener el email actual desde localStorage
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
   getUserEmail(): string | null {
-    return localStorage.getItem(this.EMAIL_KEY);
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem(this.EMAIL_KEY);
+    }
+    return null;
   }
 
-  // Guardar el email (opcional si quieres centralizarlo también aquí)
   setUserEmail(email: string): void {
-    localStorage.setItem(this.EMAIL_KEY, email);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem(this.EMAIL_KEY, email);
+    }
   }
 
-  // Eliminar el email (por ejemplo, al cerrar sesión)
   clearUserEmail(): void {
-    localStorage.removeItem(this.EMAIL_KEY);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem(this.EMAIL_KEY);
+    }
   }
 
-  // Verificar si hay sesión activa
   isLoggedIn(): boolean {
     return this.getUserEmail() !== null;
   }

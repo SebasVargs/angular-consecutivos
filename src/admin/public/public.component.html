@@ -14,34 +14,28 @@
           <th>Fecha</th>
           <th>Nombre</th>
           <th>Estado</th>
-          <th>Carga</th>
         </tr>
       </thead>
       <tbody>
         <!-- Utilizamos *ngFor para iterar sobre los documentos -->
-        <tr *ngFor="let document of documents">
-          <td>{{ document.id }}</td>
-          <td>{{ document.fecha | date:'dd/MM/yyyy' }}</td> <!-- Formato de fecha -->
-          <td>{{ document.name }}</td>
+        <tr *ngFor="let consecutive of filterConsecutives">
+          <td>{{ consecutive.consecutivo_id }}</td>
+          <td>{{ consecutive.date_soli | date:'dd/MM/yyyy' }}</td> <!-- Formato de fecha -->
+          <td>{{ consecutive.description }}</td>
           <td>
             <!-- Cambiamos el estilo de acuerdo con el estado -->
             <span class="status-badge"
                   [ngClass]="{
-                    'status-pending': document.status === 'Pendiente',
-                    'status-approved': document.status === 'Aprobado',
-                    'status-rejected': document.status === 'Rechazado',
-                    'status-processing': document.status === 'Procesando'
+                    'status-pending': consecutive.id_status.name === 'Pendiente',
+                    'status-approved': consecutive.id_status.name === 'Aprobado',
+                    'status-rejected': consecutive.id_status.name === 'Rechazado',
+                    'status-processing': consecutive.id_status.name === 'En proceso'
                   }">
-              {{ document.status }}
+              {{ consecutive.id_status.name }}
             </span>
           </td>
-          <td>
-            <!-- Si el archivo está disponible, mostramos un botón de descarga -->
-            <button class="btn btn-secondary btn-sm" *ngIf="document.load" (click)="descargarDocumento(document.id)">
-              Descargar
-            </button>
-            <!-- Si no está disponible, mostramos un texto -->
-            <span *ngIf="!document.load">No disponible</span>
+          <td *ngIf="consecutive.id_status.name === 'Pendiente'">
+            <button class="btn-primary" (click)="abrirModalCargar(consecutive)">Cargar</button>
           </td>
         </tr>
       </tbody>
@@ -49,16 +43,16 @@
   </div>
 </div>
 
-<!-- Modal de solicitud de consecutivo -->
+<!-- Modal para solicitar consecutivo -->
 <div class="modal-backdrop" *ngIf="showModal">
   <div class="modal">
     <h2>Solicitar nuevo consecutivo</h2>
     <form (ngSubmit)="enviarSolicitud()" #soliForm="ngForm">
 
-      <!--La fecha sera exactamente la actual-->
+      <!-- Fecha actual, deshabilitada -->
       <label>
         Fecha de Solicitud:
-        <input type="date" [(ngModel)]="solicitud.date_soli" name="date_soli" required />
+        <input type="date" [ngModel]="solicitud.date_soli | date:'yyyy-MM-dd'" name="date_soli" disabled />
       </label>
 
       <label>
@@ -66,22 +60,16 @@
         <input type="text" [(ngModel)]="solicitud.description" name="description" required />
       </label>
 
-
-      <!--El usuario será el que esta logeado, en este caso se validara en el localstorage-->
+      <!-- Usuario actual, visible como texto -->
       <label>
         Usuario:
-        <select [(ngModel)]="solicitud.id_user" name="id_user" required>
-          <option *ngFor="let user of users" [value]="user._id">{{ user.name }}</option>
-        </select>
+        <input type="text" [value]="userActivo?.name" disabled />
       </label>
 
-
-      <!--El estado siempre estara automatico en PENDIENTE-->
+      <!-- Estado fijo en "PENDIENTE" -->
       <label>
         Estado:
-        <select [(ngModel)]="solicitud.id_status" name="id_status" required>
-          <option *ngFor="let status of statusVerifs" [value]="status.id">{{ status.name }}</option>
-        </select>
+        <input type="text" [value]="estadoPendiente?.name" disabled />
       </label>
 
       <div class="modal-actions">
@@ -92,3 +80,35 @@
   </div>
 </div>
 
+<!-- Modal para cargar archivos -->
+<div class="modal-backdrop" *ngIf="showUploadModal">
+  <div class="modal">
+    <div class="document-info">
+      <p><strong>Descripción:</strong> {{ selectedConsecutive?.description }}</p>
+      <p><strong>Fecha de solicitud:</strong> {{ selectedConsecutive?.date_soli | date:'dd/MM/yyyy' }}</p>
+    </div>
+
+    <div class="drop-zone"
+         (dragover)="onDragOver($event)"
+         (drop)="onDrop($event)"
+         (click)="fileInput.click()">
+      <p>Suelta los archivos aquí o haz clic para seleccionar</p>
+      <input type="file" (change)="onFileSelected($event)" hidden #fileInput />
+      <button type="button" class="btn btn-secondary">Seleccionar archivo</button>
+    </div>
+
+    <!-- Mostrar información del archivo seleccionado -->
+    <div class="file-info" *ngIf="selectedFile">
+      <div>
+        <div class="file-name"><strong>Nombre:</strong> {{ selectedFile.name }}</div>
+        <div class="file-size"><strong>Tamaño:</strong> {{ (selectedFile.size / 1024).toFixed(2) }} KB</div>
+        <div class="file-type"><strong>Tipo:</strong> {{ selectedFile.type || 'Desconocido' }}</div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-primary" [disabled]="!selectedFile" (click)="subirArchivo()">Subir</button>
+      <button type="button" class="btn btn-secondary" (click)="cerrarModalCargar()">Cancelar</button>
+    </div>
+  </div>
+</div>

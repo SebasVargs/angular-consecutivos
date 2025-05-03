@@ -9,33 +9,35 @@
         <tr>
           <th>Consecutive</th>
           <th>Fecha</th>
-          <th>Nombre</th>
+          <th>Name</th>
+          <th>Source File</th>
           <th>Estado</th>
           <th>Ver</th>
         </tr>
       </thead>
       <tbody>
         <!-- Utilizamos *ngFor para iterar sobre los documentos -->
-        <tr *ngFor="let document of documents">
-          <td>{{ document.id_consecutive }}</td>
-          <td>{{ document.date_document | date:'dd/MM/yyyy' }}</td>
-          <td>{{ document.source_file }}</td>
+        <tr *ngFor="let conDocs of docsConsecList">
+          <td>{{ conDocs.id_consecutive }}</td>
+          <td>{{ conDocs.date_document | date:'dd/MM/yyyy' }}</td>
+          <td>{{ conDocs.user_name}}</td>
+          <td>{{ conDocs.source_file }}</td>
           <td>
             <span class="status-badge"
                   [ngClass]="{
-                    'status-pending': document.id_status_name === 'Pendiente',
-                    'status-approved': document.id_status_name === 'Aprobado',
-                    'status-rejected': document.id_status_name === 'Rechazado',
-                    'status-processing': document.id_status_name === 'Procesando'
+                    'status-pending': conDocs.id_status_name === 'Pendiente',
+                    'status-approved': conDocs.id_status_name === 'Aprobado',
+                    'status-rejected': conDocs.id_status_name === 'Rechazado',
+                    'status-processing': conDocs.id_status_name === 'En Proceso'
                   }">
-              {{ document.id_status_name }}
+              {{ conDocs.id_status_name }}
             </span>
           </td>
           <td>
-            <button class="btn btn-secondary btn-sm" *ngIf="document.source_file">
+            <button class="btn btn-secondary btn-sm" *ngIf="conDocs.source_file">
               Descargar
             </button>
-            <span *ngIf="!document.source_file">No disponible</span>
+            <span *ngIf="!conDocs.source_file">No disponible</span>
           </td>
         </tr>
       </tbody>

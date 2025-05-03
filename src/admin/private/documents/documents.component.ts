@@ -10,6 +10,7 @@ import { StatusService } from '../../../core/services/models/status/status.servi
 interface DocsConsec {
   id_consecutive: string | number;
   date_document: string;
+  user_name: string;
   source_file: string;
   id_status_name: string;
 }
@@ -27,18 +28,61 @@ export class DocumentsComponent {
   private consecutiveService = inject(ConsecutiveService)
   documents: DocsConsec[] = [];
   statusVerifs: any[] = [];
+  consecutives: any[] = []
+  users: any[] = []
 
   ngOnInit(): void {
     this.getDocuments()
     this.getConsecutives()
+    this.getUsers()
+  }
+
+  docsConsecList: DocsConsec[] = [];
+
+  getUsers(): void {
+    this.usersService.getUsers().subscribe({
+      next: (users) => {
+        console.log('USERS', users)
+        this.consecutiveService.getConsecutives().subscribe({
+          next: (consecutives) => {
+            console.log('CONSECUTIVES', consecutives)
+            this.documentService.getDocuments().subscribe({
+              next: (documents) => {
+                console.log('DOCUMENTS', documents)
+                this.docsConsecList = consecutives.map((con: any) => {
+                  const user = users.find((u: any) => u.id === con.id_user.id);
+                  const doc = documents.find((d: any) => d.id_consecutive.id === con.id);
+                  console.log('DOC', doc)
+
+                  return {
+                    id_consecutive: con.consecutivo_id,
+                    date_document: con.date_soli,
+                    user_name: user ? user.name : 'Desconocido',
+                    source_file: doc ? doc.source_file : 'Sin archivo',
+                    id_status_name: con.id_status.name
+                  } as DocsConsec;
+                });
+                console.log("FINAL", this.docsConsecList)
+              }
+            });
+          }
+        });
+      }
+    });
   }
 
   getConsecutives(): void {
     this.consecutiveService.getConsecutives().subscribe({
       next: (data) => {
         console.log('Consecutives', data)
+        this.consecutives = data.map((con: any) => ({
+          id: con.consecutivo_id,
+          fecha: con.date_soli,
+          name: null,
+          status: null
+        }));
       }
-    })
+    });
   }
 
   getDocuments(): void {
@@ -46,29 +90,10 @@ export class DocumentsComponent {
       next: (statusList) => {
         this.documentService.getDocuments().subscribe({
           next: (data) => {
-            // Asignar IDs consecutivos a los documentos
-            this.documents = data.map((doc: any) => {
-              console.log('Soy el doc', doc)
-              const consecutive = doc.id_consecutive.consecutivo_id || {};
-              const status = consecutive.id_status || '';
-              const foundStatus = statusList.find((s: any) => s.id === status);
-              const name_status = foundStatus ? foundStatus.name : 'Estado desconocido';
-
-              return {
-                id_consecutive: consecutive, // Genera ID consecutivos a partir de 1
-                date_document: doc.date_charge || 'N/A',
-                source_file: doc.source_file || 'N/A',
-                id_status_name: name_status
-              } as DocsConsec;
-            });
-
-            console.log('Documentos procesados:', this.documents);
+            console.log('DOCUMENTOS', data)
           }
         });
       }
     });
   }
-
-
-
 }

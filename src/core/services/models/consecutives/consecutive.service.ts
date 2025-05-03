@@ -15,4 +15,13 @@ export class ConsecutiveService {
   getConsecutives(): Observable<any>{
     return this.http.get<any>(`${environment.apiUrl}/consecutives`)
   }
+
+  createConsecutive(consecutivo: any[]): Observable<any>{
+    return this.http.post<any>(`${environment.apiUrl}/consecutives`, consecutivo)
+  }
+
+  updateElement(id: string, newStatusId: string): Observable<any> {
+    const body = { id_status: newStatusId };
+    return this.http.patch<any>(`${environment.apiUrl}/consecutives/${id}`, body);
+  }
 }
