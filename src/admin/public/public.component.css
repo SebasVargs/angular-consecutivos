@@ -89,20 +89,83 @@
   color: white;
 }
 
+/* Estilos para el modo de edición */
+.edit-status-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-select {
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.save-btn, .cancel-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.save-btn:hover {
+  background-color: #e6f7e6;
+}
+
+.cancel-btn:hover {
+  background-color: #ffeded;
+}
+
+/* Estilos para los indicadores de estado */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 .status-pending {
-  background-color: #ffc107; /* Amarillo para pendiente */
+  background-color: #fff0c2;
+  color: #856404;
 }
 
 .status-approved {
-  background-color: #28a745; /* Verde para aprobado */
+  background-color: #d4edda;
+  color: #155724;
 }
 
 .status-rejected {
-  background-color: #dc3545; /* Rojo para rechazado */
+  background-color: #f8d7da;
+  color: #721c24;
 }
 
 .status-processing {
-  background-color: #007bff; /* Azul para procesando */
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+/* Estilo para la sección de estados en el modal */
+.detail-item {
+  margin-bottom: 8px;
+}
+
+.detail-label {
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.detail-value {
+  display: flex;
+  align-items: center;
 }
 
 /* Estilos específicos para el botón de descarga (pequeño y secundario) */
