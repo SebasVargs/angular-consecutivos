@@ -13,11 +13,11 @@ export class StatusService {
   constructor() { }
 
   getStatusList(): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.apiUrl}/status`);
+    return this.http.get<any[]>(`${environment.apiUrlSql}/status`);
   }
 
   updateItem(id: string | number, statusData: any): Observable<any>{
-    return this.http.patch<any>(`${environment.apiUrl}/status/${id}`, statusData)
+    return this.http.patch<any>(`${environment.apiUrlSql}/status/${id}`, statusData)
   }
 
 }

@@ -50,123 +50,166 @@
 <div class="modal-container" *ngIf="showModal">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2 class="modal-title">Detalles del Documento</h2>
+      <h2 class="modal-title">{{ showPdfViewer ? 'Visualizador de Documento' : 'Detalles del Documento' }}</h2>
       <button class="modal-close" (click)="closeModal()">×</button>
     </div>
 
-    <div class="detail-section">
-      <h3 class="section-title">Información del Consecutivo</h3>
-      <div class="detail-grid" *ngIf="selectedConsecutive">
-        <div class="detail-item">
-          <span class="detail-label">ID:</span>
-          <span class="detail-value">{{ selectedConsecutive._id }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Consecutivo:</span>
-          <span class="detail-value">{{ selectedConsecutive.consecutivo_id }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Fecha de Solicitud:</span>
-          <span class="detail-value">{{ formatDate(selectedConsecutive.date_soli) }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Descripción:</span>
-          <span class="detail-value">{{ selectedConsecutive.description }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Estado:</span>
-          <span class="detail-value">
-            <!-- Estado normal (no editando) -->
-            <div *ngIf="!isEditingModalStatus" class="status-container">
-              <span class="status-badge" [ngClass]="{
-                'status-pending': selectedConsecutive.id_status === 'Pendiente',
-                'status-approved': selectedConsecutive.id_status === 'Completado',
-                'status-rejected': selectedConsecutive.id_status === 'Rechazado',
-                'status-processing': selectedConsecutive.id_status === 'En proceso'
-              }">
-                {{ selectedConsecutive.id_status || 'Desconocido' }}
-              </span>
-              <button class="edit-btn" (click)="startEditingModalStatus()" title="Editar estado">
-                ✏️
-              </button>
-            </div>
-
-            <!-- Estado en modo edición -->
-            <div *ngIf="isEditingModalStatus" class="edit-status-container">
-              <select [(ngModel)]="tempStatusId" class="status-select">
-                <option *ngFor="let statusOption of status" [value]="statusOption.id">
-                  {{ statusOption.name }}
-                </option>
-              </select>
-              <div class="edit-actions">
-                <button class="save-btn" (click)="saveModalStatus()" title="Guardar">💾</button>
-                <button class="cancel-btn" (click)="cancelEditingModalStatus()" title="Cancelar">❌</button>
-              </div>
-            </div>
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Información del Usuario -->
-    <div class="detail-section">
-      <h3 class="section-title">Información del Usuario</h3>
-      <div class="detail-grid" *ngIf="selectedUser">
-        <div class="detail-item">
-          <span class="detail-label">ID:</span>
-          <span class="detail-value">{{ selectedUser._id }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Nombre:</span>
-          <span class="detail-value">{{ selectedUser.name }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Email:</span>
-          <span class="detail-value">{{ selectedUser.email }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Rol:</span>
-          <span class="detail-value">{{ selectedUser.id_rol?.name || selectedUser.id_rol.name }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Creado:</span>
-          <span class="detail-value">{{ formatDate(selectedUser.createdAt) }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Actualizado:</span>
-          <span class="detail-value">{{ formatDate(selectedUser.updatedAt) }}</span>
-        </div>
-      </div>
-      <div *ngIf="!selectedUser" class="no-data">
-        <p>No se encontró información del usuario.</p>
-      </div>
-    </div>
-
-    <!-- Información del Documento -->
-    <div class="detail-section">
-      <h3 class="section-title">Información del Documento</h3>
-      <div class="detail-grid" *ngIf="selectedDocument">
-        <div class="detail-item">
-          <span class="detail-label">ID:</span>
-          <span class="detail-value">{{ selectedDocument._id }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Archivo:</span>
-          <span class="detail-value">{{ selectedDocument.source_file }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Creado:</span>
-          <span class="detail-value">{{ formatDate(selectedDocument.createdAt) }}</span>
-        </div>
-      </div>
-      <div *ngIf="!selectedDocument" class="no-data">
-        <p>No se encontró información del documento.</p>
-      </div>
-
-      <div class="document-actions" *ngIf="selectedDocument && selectedDocument.source_file">
-        <button class="btn btn-primary" (click)="downloadDocument()">
-          Descargar Documento
+    <!-- Visualizador de PDF (se muestra cuando showPdfViewer es true) -->
+    <div *ngIf="showPdfViewer" class="pdf-viewer-container">
+      <!-- Botón para volver a los detalles -->
+      <div class="pdf-viewer-actions">
+        <button class="btn btn-secondary" (click)="closePdfViewer()">
+          ← Volver a detalles
         </button>
+        <button class="btn btn-primary" (click)="downloadDocument()">
+          Descargar PDF
+        </button>
+      </div>
+
+      <!-- Indicador de carga -->
+      <div *ngIf="isPdfLoading" class="loading-indicator">
+        <p>Cargando documento, espere por favor...</p>
+      </div>
+
+      <!-- Mensaje de error -->
+      <div *ngIf="pdfErrorMessage" class="error-message">
+        <p>{{ pdfErrorMessage }}</p>
+      </div>
+
+      <!-- El visualizador de PDF -->
+      <ngx-extended-pdf-viewer
+        *ngIf="pdfSrc && !isPdfLoading"
+        [src]="pdfSrc"
+        [height]="'65vh'"
+        [showToolbar]="true"
+        [showSidebarButton]="true"
+        [showFindButton]="true"
+        [showPagingButtons]="true"
+        [showZoomButtons]="true"
+        [showPresentationModeButton]="true"
+        [showOpenFileButton]="false"
+        [showSecondaryToolbarButton]="true"
+        [showRotateButton]="true"
+        [showHandToolButton]="true"
+        >
+      </ngx-extended-pdf-viewer>
+    </div>
+
+    <!-- Vista de detalles (se muestra cuando showPdfViewer es false) -->
+    <div *ngIf="!showPdfViewer">
+      <div class="detail-section">
+        <h3 class="section-title">Información del Consecutivo</h3>
+        <div class="detail-grid" *ngIf="selectedConsecutive">
+          <div class="detail-item">
+            <span class="detail-label">ID:</span>
+            <span class="detail-value">{{ selectedConsecutive._id }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Fecha de Solicitud:</span>
+            <span class="detail-value">{{ formatDate(selectedConsecutive.date_soli) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Descripción:</span>
+            <span class="detail-value">{{ selectedConsecutive.description }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Estado:</span>
+            <span class="detail-value">
+              <!-- Estado normal (no editando) -->
+              <div *ngIf="!isEditingModalStatus" class="status-container">
+                <span class="status-badge" [ngClass]="{
+                  'status-pending': selectedConsecutive.status_name === 'Pendiente',
+                  'status-approved': selectedConsecutive.status_name === 'Completado',
+                  'status-rejected': selectedConsecutive.status_name === 'Rechazado',
+                  'status-processing': selectedConsecutive.status_name === 'En proceso'
+                }">
+                  {{ selectedConsecutive.status_name || 'Desconocido' }}
+                </span>
+                <button class="edit-btn" (click)="startEditingModalStatus()" title="Editar estado">
+                  ✏️
+                </button>
+              </div>
+
+              <!-- Estado en modo edición -->
+              <div *ngIf="isEditingModalStatus" class="edit-status-container">
+                <select [(ngModel)]="tempStatusId" class="status-select">
+                  <option *ngFor="let statusOption of status" [value]="statusOption.id">
+                    {{ statusOption.name }}
+                  </option>
+                </select>
+                <div class="edit-actions">
+                  <button class="save-btn" (click)="saveModalStatus()" title="Guardar">💾</button>
+                  <button class="cancel-btn" (click)="cancelEditingModalStatus()" title="Cancelar">❌</button>
+                </div>
+              </div>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información del Usuario -->
+      <div class="detail-section">
+        <h3 class="section-title">Información del Usuario</h3>
+        <div class="detail-grid" *ngIf="selectedUser">
+          <div class="detail-item">
+            <span class="detail-label">ID:</span>
+            <span class="detail-value">{{ selectedUser._id }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Nombre:</span>
+            <span class="detail-value">{{ selectedUser.name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value">{{ selectedUser.email }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Rol:</span>
+            <span class="detail-value">{{ selectedUser.id_rol?.name || selectedUser.id_rol.name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Creado:</span>
+            <span class="detail-value">{{ formatDate(selectedUser.createdAt) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Actualizado:</span>
+            <span class="detail-value">{{ formatDate(selectedUser.updatedAt) }}</span>
+          </div>
+        </div>
+        <div *ngIf="!selectedUser" class="no-data">
+          <p>No se encontró información del usuario.</p>
+        </div>
+      </div>
+
+      <!-- Información del Documento -->
+      <div class="detail-section">
+        <h3 class="section-title">Información del Documento</h3>
+        <div class="detail-grid" *ngIf="selectedDocument">
+          <div class="detail-item">
+            <span class="detail-label">ID:</span>
+            <span class="detail-value">{{ selectedDocument._id }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Archivo:</span>
+            <span class="detail-value">{{ selectedDocument.source_file }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Creado:</span>
+            <span class="detail-value">{{ formatDate(selectedDocument.createdAt) }}</span>
+          </div>
+        </div>
+        <div *ngIf="!selectedDocument" class="no-data">
+          <p>No se encontró información del documento.</p>
+        </div>
+
+        <div class="document-actions" *ngIf="selectedDocument && selectedDocument.source_file">
+          <button class="btn btn-primary" (click)="visualizarDocumento()">
+            Visualizar Documento
+          </button>
+          <button class="btn btn-secondary" (click)="downloadDocument()">
+            Descargar Documento
+          </button>
+        </div>
       </div>
     </div>
   </div>

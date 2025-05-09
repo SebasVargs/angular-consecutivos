@@ -15,10 +15,10 @@ export class UsersService {
   constructor() { }
 
   public getUsers(): Observable<any>{
-    return this.http.get<any>(`${environment.apiUrl}/${this.user}`)
+    return this.http.get<any>(`${environment.apiUrlMongo}/${this.user}`)
   }
 
   public createUser(user: User): Observable<any>{
-    return this.http.post<any>(`${environment.apiUrl}/${this.user}`, user)
+    return this.http.post<any>(`${environment.apiUrlMongo}/${this.user}`, user)
   }
 }
