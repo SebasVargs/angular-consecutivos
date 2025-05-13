@@ -3,6 +3,48 @@
     <h1 class="public-title">Gestión de Documentos</h1>
   </div>
 
+  <!-- Filtros para la tabla -->
+  <div class="filters-container">
+    <div class="filter-item">
+      <label for="consecutiveFilter">Consecutivo:</label>
+      <input
+        type="text"
+        id="consecutiveFilter"
+        class="filter-input"
+        [(ngModel)]="filters.consecutive"
+        (input)="applyFilters()"
+        placeholder="Filtrar por ID">
+    </div>
+
+    <div class="filter-item">
+      <label for="dateFilter">Fecha:</label>
+      <input
+        type="date"
+        id="dateFilter"
+        class="filter-input"
+        [(ngModel)]="filters.date"
+        (change)="applyFilters()">
+    </div>
+
+    <div class="filter-item">
+      <label for="statusFilter">Estado:</label>
+      <select
+        id="statusFilter"
+        class="filter-select"
+        [(ngModel)]="filters.status"
+        (change)="applyFilters()">
+        <option value="">Todos</option>
+        <option *ngFor="let statusOption of status" [value]="statusOption.name">
+          {{ statusOption.name }}
+        </option>
+      </select>
+    </div>
+
+    <button class="btn btn-secondary" (click)="resetFilters()">
+      Limpiar filtros
+    </button>
+  </div>
+
   <div class="documents-table-container">
     <table class="documents-table">
       <thead>
@@ -16,16 +58,16 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Utilizamos *ngFor para iterar sobre los documentos -->
-        <tr *ngFor="let conDocs of docsConsecList">
-          <td>{{ conDocs.id_consecutive }}</td>
+        <!-- Utilizamos *ngFor para iterar sobre los documentos filtrados -->
+        <tr *ngFor="let conDocs of filteredDocsList">
+          <td>{{ 'v' + ('' + conDocs.id_consecutive).padStart(4, '0') }}</td>
           <td>{{ conDocs.date_document | date:'dd/MM/yyyy' }}</td>
           <td>{{ conDocs.user_name}}</td>
           <td>{{ conDocs.source_file }}</td>
           <td>
             <span class="status-badge" [ngClass]="{
               'status-pending': conDocs.id_status_name === 'Pendiente',
-              'status-approved': conDocs.id_status_name === 'Completado',
+              'status-approved': conDocs.id_status_name === 'Aprobado',
               'status-rejected': conDocs.id_status_name === 'Rechazado',
               'status-processing': conDocs.id_status_name === 'En proceso'
             }">
@@ -41,11 +83,16 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Mensaje cuando no hay resultados -->
+    <div *ngIf="filteredDocsList.length === 0" class="no-results">
+      <p>No se encontraron documentos con los filtros seleccionados</p>
+    </div>
   </div>
 </div>
 
 
-<!-- Modal de Detalles -->
+<!-- Modal de Detalles (mantener igual) -->
 <div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()"></div>
 <div class="modal-container" *ngIf="showModal">
   <div class="modal-content" (click)="$event.stopPropagation()">
@@ -119,7 +166,7 @@
               <div *ngIf="!isEditingModalStatus" class="status-container">
                 <span class="status-badge" [ngClass]="{
                   'status-pending': selectedConsecutive.status_name === 'Pendiente',
-                  'status-approved': selectedConsecutive.status_name === 'Completado',
+                  'status-approved': selectedConsecutive.status_name === 'Aprobado',
                   'status-rejected': selectedConsecutive.status_name === 'Rechazado',
                   'status-processing': selectedConsecutive.status_name === 'En proceso'
                 }">
@@ -203,10 +250,7 @@
         </div>
 
         <div class="document-actions" *ngIf="selectedDocument && selectedDocument.source_file">
-          <button class="btn btn-primary" (click)="visualizarDocumento()">
-            Visualizar Documento
-          </button>
-          <button class="btn btn-secondary" (click)="downloadDocument()">
+          <button class="btn btn-secondary download" (click)="downloadDocument()">
             Descargar Documento
           </button>
         </div>

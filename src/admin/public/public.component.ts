@@ -23,7 +23,7 @@ export class PublicComponent implements OnInit {
   private userSessionService = inject(UserSessionService)
   private consecutiveService = inject(ConsecutiveService)
 
-  documents: Docs[] = [];
+  documents: any[] = [];
   consecutives: any[] = []
   statusVerifs: any[] = [];
   showModal: boolean = false;
@@ -101,14 +101,14 @@ export class PublicComponent implements OnInit {
         this.userActivo = this.users.find(u => u.email === email);
 
         if (this.userActivo) {
-          const idUsuario = this.userActivo._id;
+          const idUsuario = this.userActivo.id;
           const consecutivosUsuario = data.filter((con: any) => con.id_user === idUsuario);
 
           this.documents = consecutivosUsuario.map((con: any) => ({
-            id: con.consecutivo_id,
+            id: con.id,
             fecha: con.date_soli,
-            name: null,
-            status: null
+            name: con.description,
+            status: con.status.name
           }));
         }
       }
@@ -119,7 +119,7 @@ export class PublicComponent implements OnInit {
     this.documentService.getDocuments().subscribe({
       next: (data) => {
         this.documents = data.map((doc: Documents) => ({
-          id: doc.id_consecutive,
+          id: doc.id,
           fecha: new Date(doc.date_charge),
           name: doc.source_file,
           load: this.isFileAvailable(doc.id_consecutive),
@@ -233,7 +233,7 @@ export class PublicComponent implements OnInit {
     console.log('Consecutivo seleccionado:', this.selectedConsecutive);
 
     // Si no tenemos el ObjectId del consecutivo, mostramos un error
-    if (!this.selectedConsecutive._id) {
+    if (!this.selectedConsecutive.id) {
       console.error('El consecutivo no tiene un ObjectId válido');
     }
   }
@@ -274,11 +274,18 @@ export class PublicComponent implements OnInit {
       return;
     }
 
+    console.log("Archivo", this.selectedFile)
+
     const formData = new FormData();
     formData.append('file', this.selectedFile);
-    formData.append('id_consecutive', this.selectedConsecutive._id);
+    formData.append('id_consecutive', this.selectedConsecutive.id);
     formData.append('source_file', this.selectedFile.name);
     formData.append('date_charge', new Date().toISOString());
+
+    console.log("FORM DATA contenido:");
+    for (const pair of formData.entries()) {
+      console.log(`${pair[0]}:`, pair[1]);
+    }
 
     this.documentService.createDocument(formData).subscribe({
       next: (response) => {
@@ -298,13 +305,20 @@ export class PublicComponent implements OnInit {
         this.statusVerifs = data;
         const estadoProceso = this.statusVerifs.find(s => s.name === 'En proceso');
 
+        console.log("STATUS VERIFS", this.statusVerifs)
+        console.log("ESTADO PROCESO", estadoProceso)
+
         if (estadoProceso) {
           const statusId = estadoProceso.id;
           const consecutiveId = this.selectedConsecutive.id;
 
+          console.log("STATUS ID", statusId)
+          console.log("CONSECUTIVE ID", consecutiveId)
+
           this.consecutiveService.updateElement(consecutiveId, statusId).subscribe({
             next: (response) => {
               console.log('Consecutivo actualizado:', response);
+              this.getConsecutives();
             },
             error: (err) => {
               console.error('Error al actualizar consecutivo:', err);

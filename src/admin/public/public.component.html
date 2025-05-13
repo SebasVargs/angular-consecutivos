@@ -18,23 +18,23 @@
       </thead>
       <tbody>
         <!-- Utilizamos *ngFor para iterar sobre los documentos -->
-        <tr *ngFor="let consecutive of filterConsecutives">
-          <td>{{ consecutive.consecutivo_id }}</td>
-          <td>{{ consecutive.date_soli | date:'dd/MM/yyyy' }}</td> <!-- Formato de fecha -->
-          <td>{{ consecutive.description }}</td>
+        <tr *ngFor="let consecutive of documents">
+          <td>{{ 'v' + ('' + consecutive.id).padStart(4, '0') }}</td>
+          <td>{{ consecutive.fecha | date:'dd/MM/yyyy' }}</td> <!-- Formato de fecha -->
+          <td>{{ consecutive.name }}</td>
           <td>
             <!-- Cambiamos el estilo de acuerdo con el estado -->
             <span class="status-badge"
                   [ngClass]="{
-                    'status-pending': consecutive.id_status.name === 'Pendiente',
-                    'status-approved': consecutive.id_status.name === 'Completado',
-                    'status-rejected': consecutive.id_status.name === 'Rechazado',
-                    'status-processing': consecutive.id_status.name === 'En proceso'
+                    'status-pending': consecutive.status === 'Pendiente',
+                    'status-approved': consecutive.status === 'Aprobado',
+                    'status-rejected': consecutive.status === 'Rechazado',
+                    'status-processing': consecutive.status === 'En proceso'
                   }">
-              {{ consecutive.id_status.name }}
+              {{ consecutive.status }}
             </span>
           </td>
-          <td *ngIf="consecutive.id_status.name === 'Pendiente'">
+          <td *ngIf="consecutive.status === 'Pendiente' || consecutive.status === 'Rechazado'">
             <button class="btn-primary" (click)="abrirModalCargar(consecutive)">Cargar</button>
           </td>
         </tr>
@@ -84,8 +84,8 @@
 <div class="modal-backdrop" *ngIf="showUploadModal">
   <div class="modal">
     <div class="document-info">
-      <p><strong>Descripción:</strong> {{ selectedConsecutive?.description }}</p>
-      <p><strong>Fecha de solicitud:</strong> {{ selectedConsecutive?.date_soli | date:'dd/MM/yyyy' }}</p>
+      <p><strong>Descripción:</strong> {{ selectedConsecutive?.name }}</p>
+      <p><strong>Fecha de solicitud:</strong> {{ selectedConsecutive?.fecha | date:'dd/MM/yyyy' }}</p>
     </div>
 
     <div class="drop-zone"

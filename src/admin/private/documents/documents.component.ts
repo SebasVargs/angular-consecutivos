@@ -1,6 +1,6 @@
 // documents.component.ts
-import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, inject, OnInit, PLATFORM_ID, Inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { DocumentService } from '../../../core/services/models/documents/document.service';
@@ -8,6 +8,7 @@ import { UsersService } from '../../../core/services/models/users/users.service'
 import { ConsecutiveService } from '../../../core/services/models/consecutives/consecutive.service';
 import { StatusService } from '../../../core/services/models/status/status.service';
 import { forkJoin } from 'rxjs';
+import { DocumentDownloaderService } from '../../../core/services/document-download.service';
 
 // Interfaces definidas fuera del componente para mejor legibilidad
 interface DocsConsec {
@@ -57,6 +58,13 @@ interface StatusItem {
   name: string;
 }
 
+// Interfaz para los filtros
+interface DocsFilters {
+  consecutive: string;
+  date: string;
+  status: string;
+}
+
 @Component({
   selector: 'app-documents',
   standalone: true,
@@ -70,13 +78,22 @@ export class DocumentsComponent implements OnInit {
   private usersService = inject(UsersService);
   private statusService = inject(StatusService);
   private consecutiveService = inject(ConsecutiveService);
+  private downloader = inject(DocumentDownloaderService);
 
   // Datos principales
   docsConsecList: DocsConsec[] = [];
+  filteredDocsList: DocsConsec[] = [];
   users: any[] = [];
   documents: any[] = [];
   consecutives: any[] = [];
   status: StatusItem[] = [];
+
+  // Filtros
+  filters: DocsFilters = {
+    consecutive: '',
+    date: '',
+    status: ''
+  };
 
   // Estado del modal
   showModal = false;
@@ -90,6 +107,7 @@ export class DocumentsComponent implements OnInit {
   isPdfLoading = false;
   showPdfViewer = false;
   pdfErrorMessage: string | null = null;
+  isDownloading = false;
 
   // Selecciones actuales
   selectedConsecutiveId: string | number | null = null;
@@ -97,6 +115,8 @@ export class DocumentsComponent implements OnInit {
   selectedDocument: DocumentDetail | null = null;
   selectedConsecutive: ConsecutiveDetail | null = null;
   documentToView: string | null = null;
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit(): void {
     this.loadAllData();
@@ -125,6 +145,9 @@ export class DocumentsComponent implements OnInit {
           results.users,
           results.documents
         );
+
+        // Inicializar la lista filtrada con todos los documentos
+        this.filteredDocsList = [...this.docsConsecList];
 
         this.isLoading = false;
       },
@@ -173,6 +196,51 @@ export class DocumentsComponent implements OnInit {
         consecutiveDbId: con.id
       };
     });
+  }
+
+  // ======= GESTIÓN DE FILTROS =======
+
+  // Aplicar filtros a la lista de documentos
+  applyFilters(): void {
+    this.filteredDocsList = this.docsConsecList.filter(doc => {
+      // Filtrar por consecutivo (ID)
+      const matchesConsecutive = this.filters.consecutive
+        ? doc.id_consecutive.toString().includes(this.filters.consecutive)
+        : true;
+
+      // Filtrar por fecha (formateamos la fecha para comparar solo año-mes-día)
+      const matchesDate = this.filters.date
+        ? this.compareOnlyDate(doc.date_document, this.filters.date)
+        : true;
+
+      // Filtrar por estado
+      const matchesStatus = this.filters.status
+        ? doc.id_status_name === this.filters.status
+        : true;
+
+      // El documento debe cumplir con todos los filtros aplicados
+      return matchesConsecutive && matchesDate && matchesStatus;
+    });
+  }
+
+  // Comparar solo la fecha (año-mes-día) sin tener en cuenta la hora
+  private compareOnlyDate(dateStr1: string, dateStr2: string): boolean {
+    const date1 = new Date(dateStr1);
+    const date2 = new Date(dateStr2);
+
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
+  }
+
+  // Restablecer todos los filtros
+  resetFilters(): void {
+    this.filters = {
+      consecutive: '',
+      date: '',
+      status: ''
+    };
+    this.filteredDocsList = [...this.docsConsecList];
   }
 
   // ======= GESTIÓN DE VISTA DE DOCUMENTOS =======
@@ -232,27 +300,69 @@ export class DocumentsComponent implements OnInit {
     }
 
     const filename = this.selectedDocument.source_file.split('/').pop() || 'documento.pdf';
+    this.isDownloading = true;
 
-    this.documentService.getDocumentFile(filename).subscribe({
-      next: (pdfData: Blob) => {
-        if (pdfData.size === 0) {
-          this.errorMessage = 'El archivo PDF está vacío';
-          return;
+    // Verificar si estamos en un entorno de navegador (SSR compatible)
+    if (isPlatformBrowser(this.platformId)) {
+      // Obtenemos la ruta base y luego manejamos la descarga con el servicio especializado
+      this.documentService.getDocumentFile(filename).subscribe({
+        next: (pdfData: Blob) => {
+          if (pdfData.size === 0) {
+            this.errorMessage = 'El archivo PDF está vacío';
+            this.isDownloading = false;
+            return;
+          }
+
+          // Método simple alternativo si no quieres usar el servicio
+          const url = window.URL.createObjectURL(pdfData);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+
+          // Limpiar recursos
+          setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            this.isDownloading = false;
+          }, 100);
+        },
+        error: (err: any) => {
+          this.errorMessage = `Error al descargar el documento: ${err.status === 404 ? 'Archivo no encontrado' : 'Error en el servidor'}`;
+          this.isDownloading = false;
         }
+      });
+    } else {
+      // En SSR (servidor), no podemos descargar archivos
+      console.log('Descarga no disponible en el servidor (SSR)');
+      this.isDownloading = false;
+    }
+  }
 
-        const url = window.URL.createObjectURL(pdfData);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
+  // Método alternativo usando el servicio especializado
+  downloadDocumentWithService(): void {
+    if (!this.selectedDocument?.source_file) {
+      this.errorMessage = 'No hay documento disponible para descargar';
+      return;
+    }
 
-        // Limpiar recursos
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+    const filename = this.selectedDocument.source_file.split('/').pop() || 'documento.pdf';
+    this.isDownloading = true;
+
+    // Construimos la URL apropiada para la API
+    // Nota: Ajusta esto según la estructura de tu API
+    const documentEndpoint = this.documentService.getApiEndpoint();
+    const documentUrl = `${documentEndpoint}/file/${filename}`;
+
+    this.downloader.downloadDocument(documentUrl, filename).subscribe({
+      next: () => {
+        this.isDownloading = false;
+        // Éxito - la descarga se inició
       },
-      error: (err: any) => {
-        this.errorMessage = `Error al descargar el documento: ${err.status === 404 ? 'Archivo no encontrado' : 'Error en el servidor'}`;
+      error: (err) => {
+        this.errorMessage = err.message;
+        this.isDownloading = false;
       }
     });
   }
@@ -407,7 +517,6 @@ export class DocumentsComponent implements OnInit {
 
     this.consecutiveService.updateElement(consecutiveId, this.tempStatusId.toString()).subscribe({
       next: () => {
-        // Actualizar el estado en el modal
         const selectedStatus = this.status.find(s => s.id === this.tempStatusId);
         if (selectedStatus && this.selectedConsecutive) {
           this.selectedConsecutive.status_name = selectedStatus.name;
@@ -424,7 +533,7 @@ export class DocumentsComponent implements OnInit {
 
         this.isEditingModalStatus = false;
 
-        // Refrescar los datos
+        // Refrescar los datos y aplicar filtros actualizados
         this.loadAllData();
       },
       error: (error) => {
