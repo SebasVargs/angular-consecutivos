@@ -1,18 +1,19 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../../environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RolService {
-  private apiUrl: string = 'http://localhost:3000/api/roles';
+  private apiUrl: string = environment.apiUrlMongo;
   private http = inject(HttpClient);
 
   constructor() { }
 
   public getRoles(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}`);
+    return this.http.get<any[]>(`${this.apiUrl}/roles`);
   }
 
   public getRol(id: string): Observable<any> {

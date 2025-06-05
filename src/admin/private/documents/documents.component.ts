@@ -60,8 +60,8 @@ interface StatusItem {
 
 // Interfaz para los filtros
 interface DocsFilters {
-  consecutive: string;
-  date: string;
+  userName: string;
+  fileName: string;
   status: string;
 }
 
@@ -90,8 +90,8 @@ export class DocumentsComponent implements OnInit {
 
   // Filtros
   filters: DocsFilters = {
-    consecutive: '',
-    date: '',
+    userName: '',
+    fileName: '',
     status: ''
   };
 
@@ -204,13 +204,13 @@ export class DocumentsComponent implements OnInit {
   applyFilters(): void {
     this.filteredDocsList = this.docsConsecList.filter(doc => {
       // Filtrar por consecutivo (ID)
-      const matchesConsecutive = this.filters.consecutive
-        ? doc.id_consecutive.toString().includes(this.filters.consecutive)
+      const matchesUserName = this.filters.userName
+        ? doc.user_name.toLowerCase().includes(this.filters.userName.toLowerCase())
         : true;
 
       // Filtrar por fecha (formateamos la fecha para comparar solo año-mes-día)
-      const matchesDate = this.filters.date
-        ? this.compareOnlyDate(doc.date_document, this.filters.date)
+      const matchesFileName = this.filters.fileName
+        ? doc.source_file.toLowerCase().includes(this.filters.fileName.toLowerCase())
         : true;
 
       // Filtrar por estado
@@ -219,25 +219,15 @@ export class DocumentsComponent implements OnInit {
         : true;
 
       // El documento debe cumplir con todos los filtros aplicados
-      return matchesConsecutive && matchesDate && matchesStatus;
+      return matchesUserName && matchesFileName && matchesStatus;
     });
-  }
-
-  // Comparar solo la fecha (año-mes-día) sin tener en cuenta la hora
-  private compareOnlyDate(dateStr1: string, dateStr2: string): boolean {
-    const date1 = new Date(dateStr1);
-    const date2 = new Date(dateStr2);
-
-    return date1.getFullYear() === date2.getFullYear() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getDate() === date2.getDate();
   }
 
   // Restablecer todos los filtros
   resetFilters(): void {
     this.filters = {
-      consecutive: '',
-      date: '',
+      userName: '',
+      fileName: '',
       status: ''
     };
     this.filteredDocsList = [...this.docsConsecList];

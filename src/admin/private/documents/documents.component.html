@@ -6,24 +6,25 @@
   <!-- Filtros para la tabla -->
   <div class="filters-container">
     <div class="filter-item">
-      <label for="consecutiveFilter">Consecutivo:</label>
+      <label for="consecutiveFilter">Nombre Usuario:</label>
       <input
         type="text"
-        id="consecutiveFilter"
+        id="userNameFilter"
         class="filter-input"
-        [(ngModel)]="filters.consecutive"
+        [(ngModel)]="filters.userName"
         (input)="applyFilters()"
-        placeholder="Filtrar por ID">
+        placeholder="Filtrar por Usuario">
     </div>
 
     <div class="filter-item">
-      <label for="dateFilter">Fecha:</label>
+      <label for="dateFilter">Nombre Archivo:</label>
       <input
-        type="date"
-        id="dateFilter"
+        type="text"
+        id="fileNameFilter"
         class="filter-input"
-        [(ngModel)]="filters.date"
-        (change)="applyFilters()">
+        [(ngModel)]="filters.fileName"
+        (change)="applyFilters()"
+        placeholder="Filtrar por Archivo">
     </div>
 
     <div class="filter-item">
